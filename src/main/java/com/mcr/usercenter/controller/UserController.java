@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,15 +59,13 @@ public class UserController {
     }
 
     @PostMapping("/search")
-    public List<SafeUser> searchUsers(String username, HttpServletRequest request) {
-        if (!isAdmin(request)) {
-            return new ArrayList<SafeUser>();
-        }
+    public BaseResult searchUsers(String username, HttpServletRequest request) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         if (StringUtils.isNotBlank(username)) {
             queryWrapper.like("username", username);
         }
-        return userService.list(queryWrapper).stream().map(SafeUser::new).collect(Collectors.toList());
+        List<SafeUser> userList = userService.list(queryWrapper).stream().map(SafeUser::new).collect(Collectors.toList());
+        return BaseResult.getSuccessResult(userList);
     }
 
     @PostMapping("/delete")
